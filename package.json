@@ -1,6 +1,6 @@
 {
   "name": "@twin-studio/viewer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "packageManager": "pnpm@11.19.0",
   "description": "Portable Vue 3 viewer runtime for Twin Studio .twin.zip projects",
   "type": "module",
