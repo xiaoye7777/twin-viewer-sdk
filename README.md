@@ -1,6 +1,8 @@
 # @twin-studio/viewer
 
-当前本地发行版：`0.1.1`。
+当前本地发行版：`0.1.2`。
+
+开发与打包支持 Node.js `20.16.0+`，推荐使用仓库声明的 pnpm `10.20.0`。
 
 Vue 3 运行态组件，用于直接加载 Twin Studio 导出的 `.twin.zip`。组件恢复 SceneDocument、GLB/HDR、设备绑定、Mock 实时数据、原子特效、可视化规则和交互配置。
 
@@ -40,3 +42,9 @@ import '@twin-studio/viewer/style.css'
 - Mock 与 WebSocket 切换时先停止旧数据源并清空旧实时值。
 - 对外暴露连接状态、消息计数和错误诊断。
 - Viewer 销毁或切换项目时主动关闭 WebSocket。
+
+## 0.1.2
+
+- 开发工具链调整为 Vite 6.4.3 和 `@vitejs/plugin-vue` 5.2.4。
+- 项目包管理器调整为 pnpm 10.20.0。
+- SDK 开发、构建与使用环境支持 Node.js 20.16.0。
