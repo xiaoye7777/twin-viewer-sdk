@@ -1,0 +1,38 @@
+{
+  "name": "@twin-studio/viewer",
+  "version": "0.1.0",
+  "packageManager": "pnpm@11.19.0",
+  "description": "Portable Vue 3 viewer runtime for Twin Studio .twin.zip projects",
+  "type": "module",
+  "files": ["dist", "index.d.ts", "README.md"],
+  "main": "./dist/twin-viewer.js",
+  "module": "./dist/twin-viewer.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": { "types": "./index.d.ts", "import": "./dist/twin-viewer.js" },
+    "./style.css": "./dist/twin-viewer.css"
+  },
+  "sideEffects": ["**/*.css"],
+  "scripts": {
+    "type-check": "vue-tsc --noEmit",
+    "build": "pnpm run type-check && vite build",
+    "pack:sdk": "pnpm pack"
+  },
+  "peerDependencies": {
+    "three": "0.184.0",
+    "vue": "^3.5.0"
+  },
+  "devDependencies": {
+    "@meteor3d/core": "file:./vendor/meteor3d-core",
+    "@types/node": "24.10.1",
+    "@types/three": "0.184.0",
+    "@vitejs/plugin-vue": "6.0.2",
+    "fflate": "0.8.3",
+    "three": "0.184.0",
+    "typescript": "5.9.3",
+    "vite": "7.2.4",
+    "vue": "3.5.25",
+    "vue-tsc": "3.1.5"
+  },
+  "engines": { "node": "^20.19.0 || >=22.12.0" }
+}
