@@ -37,7 +37,7 @@ export class VisualRuleRuntime {
   ) {
     subscriptions++
     this.stopWatch = watch(
-      [rules, manual, () => state.runtimeRevision, () => state.bindings, () => state.mockRunning, revision],
+      [rules, manual, () => state.runtimeRevision, () => state.bindings, () => state.dataSourceStatus, revision],
       () => this.refresh(), { immediate: true, flush: 'sync' },
     )
   }
@@ -49,7 +49,7 @@ export class VisualRuleRuntime {
       const diagnostic: RuleDiagnostic = { status: 'inactive', effects: 0, visibleEffects: 0 }
       diagnostics[rule.id] = diagnostic
       if (!rule.enabled) { diagnostic.status = 'disabled'; continue }
-      if (!this.state.mockRunning) { diagnostic.status = 'stopped'; continue }
+      if (this.state.dataSourceStatus !== 'connected') { diagnostic.status = 'stopped'; continue }
       const binding = this.state.getBindingById(rule.bindingId)
       const variable = binding?.variables.find(v => v.key === rule.variableKey)
       let reason = ''

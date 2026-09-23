@@ -1,6 +1,7 @@
 import type { DeepReadonly } from 'vue'
 import type { TwinBinding, TwinBindingResolution, TwinBindingTarget, TwinDevice, TwinRuntimeValue } from '@/domain/twin'
 import type { InteractionMetadata, InteractionTrigger } from '@/domain/interactions'
+import type { DataSourceConnectionStatus, DataSourceType, ViewerDataSourceConfig } from '@/infrastructure/data'
 
 export type { TwinBindingTarget } from '@/domain/twin'
 
@@ -59,6 +60,10 @@ export type ViewerRuntimeState = DeepReadonly<{
   resolutionRevision: number
   mockRunning: boolean
   mockTickCount: number
+  dataSourceType: DataSourceType
+  dataSourceStatus: DataSourceConnectionStatus
+  dataSourceMessageCount: number
+  dataSourceError: string | null
 }> & {
   getRuntimeValue(bindingId: string, variableKey: string): DeepReadonly<TwinRuntimeValue> | null
 }
@@ -71,4 +76,12 @@ export interface TwinSceneViewerPublicApi {
   clearSelection(): void
   getSelection(): ViewerSelection
   getRuntimeState(): ViewerRuntimeState | null
+  setDataSource(config: ViewerDataSourceConfig): boolean
+  getDiagnostics(): ViewerDiagnostics
+}
+
+export interface ViewerDiagnostics {
+  dataSource: { type: DataSourceType; status: DataSourceConnectionStatus; messageCount: number; error: string | null }
+  visualRules: { activations: number; activeRules: number }
+  effects: { effects: number; transientOwners: number; helpers: number; outlined: number }
 }

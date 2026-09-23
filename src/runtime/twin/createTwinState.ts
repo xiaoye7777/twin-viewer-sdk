@@ -7,6 +7,7 @@ import {
   type TwinRuntimeValue,
   type TwinRuntimeValueData,
 } from '@/domain/twin'
+import type { DataSourceConnectionStatus, DataSourceType } from '@/infrastructure/data'
 
 function cloneBinding(binding: TwinBinding): TwinBinding {
   return {
@@ -31,6 +32,10 @@ export function createTwinState(onConfigurationChanged: () => void = () => {} ) 
   const resolutionRevision = ref(0)
   const mockRunning = ref(false)
   const mockTickCount = ref(0)
+  const dataSourceType = ref<DataSourceType>('mock')
+  const dataSourceStatus = ref<DataSourceConnectionStatus>('disconnected')
+  const dataSourceMessageCount = ref(0)
+  const dataSourceError = ref<string | null>(null)
 
   function initializeProject(nextProjectId: string, savedBindings: readonly TwinBinding[] = []): void {
     projectId.value = nextProjectId
@@ -41,6 +46,9 @@ export function createTwinState(onConfigurationChanged: () => void = () => {} ) 
     runtimeRevision.value += 1
     resolutionRevision.value += 1
     mockTickCount.value = 0
+    dataSourceStatus.value = 'disconnected'
+    dataSourceMessageCount.value = 0
+    dataSourceError.value = null
   }
 
   function resetProject(leavingProjectId: string): void {
@@ -54,6 +62,9 @@ export function createTwinState(onConfigurationChanged: () => void = () => {} ) 
     resolutionRevision.value += 1
     mockRunning.value = false
     mockTickCount.value = 0
+    dataSourceStatus.value = 'disconnected'
+    dataSourceMessageCount.value = 0
+    dataSourceError.value = null
   }
 
   function getBindingByTarget(target: TwinBindingTarget): TwinBinding | null {
@@ -132,6 +143,12 @@ export function createTwinState(onConfigurationChanged: () => void = () => {} ) 
     runtimeRevision.value += 1
   }
 
+  function clearRuntimeValues(): void {
+    if (!Object.keys(runtimeValues.value).length) return
+    runtimeValues.value = {}
+    runtimeRevision.value += 1
+  }
+
   function getRuntimeValue(bindingId: string, variableKey: string): TwinRuntimeValue | null {
     return runtimeValues.value[runtimeValueKey(bindingId, variableKey)] ?? null
   }
@@ -144,6 +161,13 @@ export function createTwinState(onConfigurationChanged: () => void = () => {} ) 
 
   function setMockRunning(value: boolean): void { mockRunning.value = value }
   function recordMockTick(): void { mockTickCount.value += 1 }
+  function setDataSourceState(type: DataSourceType, status: DataSourceConnectionStatus, error?: string): void {
+    dataSourceType.value = type
+    dataSourceStatus.value = status
+    dataSourceError.value = error ?? null
+  }
+  function recordDataSourceMessage(): void { dataSourceMessageCount.value += 1 }
+  function resetDataSourceMessages(): void { dataSourceMessageCount.value = 0 }
 
   return {
     projectId,
@@ -155,6 +179,10 @@ export function createTwinState(onConfigurationChanged: () => void = () => {} ) 
     resolutionRevision,
     mockRunning,
     mockTickCount,
+    dataSourceType,
+    dataSourceStatus,
+    dataSourceMessageCount,
+    dataSourceError,
     initializeProject,
     resetProject,
     getBindingByTarget,
@@ -164,10 +192,14 @@ export function createTwinState(onConfigurationChanged: () => void = () => {} ) 
     removeBindingsForTargets,
     restoreBindings,
     setRuntimeValue,
+    clearRuntimeValues,
     getRuntimeValue,
     setResolutionStatus,
     setMockRunning,
     recordMockTick,
+    setDataSourceState,
+    recordDataSourceMessage,
+    resetDataSourceMessages,
     cloneBindings: () => bindings.value.map(cloneBinding),
   }
 }

@@ -14,6 +14,8 @@ import { createTwinState } from './createTwinState'
 import { TwinDataRuntime } from './TwinDataRuntime'
 import { ViewerPointerEvents, type ViewerTargetClick } from './ViewerPointerEvents'
 import { InteractionRuntime } from '@/runtime/interactions/InteractionRuntime'
+import type { ViewerDataSourceConfig } from '@/infrastructure/data'
+import type { ViewerDiagnostics } from '@/components/viewerContract'
 
 /** One independent runtime session per Viewer; repositories are injected. */
 export class TwinSceneRuntime {
@@ -39,6 +41,7 @@ export class TwinSceneRuntime {
     private readonly onClick: (event: ViewerTargetClick) => void,
     private readonly onSelectionChange: (selection: ViewerSelection) => void = () => {},
     private readonly onInteractionEvent: (event: ViewerInteractionEvent) => void = () => {},
+    private dataSourceConfig: ViewerDataSourceConfig = { type: 'mock' },
   ) {
     this.meteor = new MeteorScene(canvas)
     this.loader = new SceneRuntimeLoader(this.meteor, assets)
@@ -72,7 +75,7 @@ export class TwinSceneRuntime {
       })
       this.interactions.setInteractions(document.interactions ?? [])
       this.interactions.setPointerActive(true)
-      this.data.start()
+      this.data.start(this.dataSourceConfig)
       this.pointers = new ViewerPointerEvents(this.canvas, this.meteor, this.roots, this.twin, (event) => {
         if (this.disposed) return
         this.selectTarget(event.target)
@@ -142,6 +145,31 @@ export class TwinSceneRuntime {
   async focusDevice(deviceId: string): Promise<boolean> {
     const binding = this.twin.bindings.find((item) => item.device.id === deviceId && this.twin.resolutionByBindingId[item.id] === 'resolved')
     return binding ? this.focusTarget(binding.target) : false
+  }
+  setDataSource(config: ViewerDataSourceConfig): boolean {
+    if (this.disposed || !this.started) return false
+    this.dataSourceConfig = { ...config }
+    this.data.setDataSource(this.dataSourceConfig)
+    return true
+  }
+  getDiagnostics(): ViewerDiagnostics {
+    const rules = this.visualRules?.getDiagnostics()
+    const effects = this.effects?.getDiagnostics()
+    return {
+      dataSource: {
+        type: this.twin.dataSourceType,
+        status: this.twin.dataSourceStatus,
+        messageCount: this.twin.dataSourceMessageCount,
+        error: this.twin.dataSourceError,
+      },
+      visualRules: { activations: rules?.activations ?? 0, activeRules: rules?.activeRules ?? 0 },
+      effects: {
+        effects: effects?.effects ?? 0,
+        transientOwners: effects?.transientOwners ?? 0,
+        helpers: effects?.helpers ?? 0,
+        outlined: effects?.outlined ?? 0,
+      },
+    }
   }
   dispose(): void {
     if (this.disposed) return

@@ -14,6 +14,10 @@ export function createViewerRuntimeState(state: TwinRuntimeState): ViewerRuntime
     get resolutionRevision() { return state.resolutionRevision },
     get mockRunning() { return state.mockRunning },
     get mockTickCount() { return state.mockTickCount },
+    get dataSourceType() { return state.dataSourceType },
+    get dataSourceStatus() { return state.dataSourceStatus },
+    get dataSourceMessageCount() { return state.dataSourceMessageCount },
+    get dataSourceError() { return state.dataSourceError },
     getRuntimeValue(bindingId: string, variableKey: string) {
       const value = state.getRuntimeValue(bindingId, variableKey)
       return value ? readonly(value) : null
